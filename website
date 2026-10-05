@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Melt Of Joy: hand-poured candles and wax bouquets.">
+<link rel="icon" href="images/logo-flame.png">
+<title>Melt Of Joy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Belleza&family=Figtree:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one quiet column, a top bar with three pill tabs, products on a loose grid of rounded tiles. */
+  :root {
+    --bg: #F6F4F3;        /* unscented wax */
+    --surface: #EDE8E6;
+    --ink: #221C1B;
+    --muted: #6E6361;
+    --line: #DCD4D1;
+    --flame: #C27A2C;     /* candle flame amber */
+    --petal: #C9A3A0;     /* dusty rose wax */
+    --wick: #3A302E;
+    --photo: #ECECEC;     /* matches the studio backdrop in the bouquet photos */
+    --display: "Belleza", Optima, Candara, "Segoe UI", sans-serif;  /* closest web match to the label wordmark */
+    --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --r: 40px;            /* squircle-ish corner for every tile */
+    --ease: cubic-bezier(.65, 0, .35, 1);
+    --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  /* Single light theme on purpose: the black logo is made for a light ground. */
+  :root { color-scheme: light; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0;
+    background: var(--bg); color: var(--ink);
+    font-family: var(--body); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 24px; }
+  @media (max-width: 480px) { .wrap { padding-inline: 16px; } }
+
+  header {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 600px) { header { position: static; } }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 18px; }
+  .logo { text-decoration: none; display: flex; align-items: center; gap: 10px; border-radius: var(--r); }
+  .logo .flame { height: 38px; width: auto; display: block; }
+  /* The wordmark image includes the descenders of "J" and "y"; nudge it down so its capitals sit centered on the flame. */
+  .logo .word { height: 24px; width: auto; display: block; transform: translateY(2.5px); }
+  nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav button {
+    font: 500 .78rem/1 var(--body); letter-spacing: .14em; text-transform: uppercase;
+    background: transparent; border: 0; color: var(--muted); padding: 11px 16px; cursor: pointer;
+    border-radius: var(--r); transition: background .35s var(--ease), color .35s var(--ease);
+  }
+  nav button:hover { color: var(--ink); background: color-mix(in srgb, var(--surface) 60%, transparent); }
+  nav button[aria-selected="true"] { color: var(--bg); background: var(--ink); }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--flame); outline-offset: 3px; border-radius: var(--r); }
+
+  section[role="tabpanel"] { padding-block: 64px 96px; transition: opacity .42s var(--ease), transform .42s var(--ease); }
+  section[role="tabpanel"].leaving { opacity: 0; transform: translateY(-10px); transition-duration: .26s; }
+  section[role="tabpanel"].entering { opacity: 0; transform: translateY(18px); transition: none; }
+  @media (max-width: 600px) { section[role="tabpanel"] { padding-block: 40px 64px; } }
+
+  .eyebrow { font: 500 .74rem/1 var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 18px; }
+  h1, h2 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.6rem, 7vw, 4.6rem); line-height: 1.04; letter-spacing: -.01em; }
+  h1 em, h2 em { color: var(--flame); font-style: normal; }
+  h2 { font-size: clamp(2rem, 4.5vw, 2.9rem); line-height: 1.1; }
+  .lede { max-width: 34em; color: var(--muted); font-size: 1.08rem; margin: 22px 0 0; }
+
+  /* Home */
+  .hero { display: grid; grid-template-columns: 1.2fr .8fr; gap: 48px; align-items: center; }
+  .hero > * { min-width: 0; }
+  .hero-art { aspect-ratio: 4/5; max-width: 100%; background: var(--photo); overflow: hidden; border-radius: var(--r); }
+  .hero-art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; display: block; }
+  @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } .hero-art { aspect-ratio: 4/3; } }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+  .btn {
+    font: 500 .8rem/1 var(--body); letter-spacing: .12em; text-transform: uppercase;
+    padding: 16px 26px; cursor: pointer; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
+    border-radius: var(--r); transition: opacity .3s var(--ease), transform .3s var(--ease);
+  }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn:hover { opacity: .85; transform: translateY(-1px); }
+
+  .story { display: grid; grid-template-columns: 220px 1fr; gap: 48px; margin-top: 96px; padding-top: 48px; border-top: 1px solid var(--line); }
+  .story > * { min-width: 0; }
+  .story p { max-width: 36em; margin: 0 0 1.1em; }
+  .story .first { font-family: var(--display); font-size: 1.45rem; line-height: 1.4; }
+  .values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
+  .values h3 { font: 600 .95rem/1.3 var(--body); margin: 0 0 6px; }
+  .values p { color: var(--muted); font-size: .95rem; margin: 0; }
+  @media (max-width: 760px) { .story { grid-template-columns: 1fr; gap: 16px; margin-top: 64px; } .values { grid-template-columns: 1fr; gap: 20px; } }
+
+  /* Product pages */
+  .ph { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; margin-bottom: 48px; }
+  .ph > div { min-width: 0; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 28px; }
+  .grid.four { grid-template-columns: repeat(4, 1fr); gap: 40px 22px; }
+  @media (max-width: 860px) { .grid, .grid.four { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .grid, .grid.four { grid-template-columns: 1fr; } }
+  .card { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .card .img { aspect-ratio: 1; overflow: hidden; border-radius: var(--r); max-width: 100%; background: var(--surface); display: grid; place-items: center; transition: background .3s; }
+  .card:hover .img { background: color-mix(in srgb, var(--surface) 80%, var(--petal)); }
+  .card .img img { display: block; }
+  .card .img.photo { aspect-ratio: 3/4; background: var(--photo); overflow: hidden; }
+  .card .img.photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+  .card:hover .img.photo img { transform: scale(1.03); }
+  .card:hover .img.photo { background: var(--photo); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .card h3 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; line-height: 1.25; margin: 0; }
+  .card .price { font-family: var(--mono); font-size: .95rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .card .notes { color: var(--muted); font-size: .92rem; margin: 0; }
+  .card .spec { font-family: var(--mono); font-size: .74rem; letter-spacing: .04em; color: var(--muted); margin: 0; }
+
+  .care { margin-top: 72px; padding-top: 32px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 220px 1fr; gap: 48px; }
+  .care > * { min-width: 0; }
+  .care ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; max-width: 38em; }
+  .care li { color: var(--muted); padding-left: 20px; position: relative; }
+  .care li::before { content: ""; position: absolute; left: 0; top: .72em; width: 8px; height: 1px; background: var(--flame); }
+  @media (max-width: 760px) { .care { grid-template-columns: 1fr; gap: 12px; } }
+
+  /* Policies */
+  .policy-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 28px; }
+  .chip { font: 500 .78rem/1 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink);
+    background: transparent; border: 1px solid var(--line); border-radius: var(--r); padding: 11px 18px; cursor: pointer;
+    transition: background .3s var(--ease); }
+  .chip:hover { background: var(--surface); }
+  .policy { display: grid; grid-template-columns: 220px 1fr; gap: 48px; padding-top: 40px; margin-top: 56px; border-top: 1px solid var(--line); scroll-margin-top: 96px; }
+  .policy > * { min-width: 0; }
+  .policy h3 { font-family: var(--display); font-weight: 400; font-size: 1.6rem; line-height: 1.2; margin: 0; }
+  .policy h4 { font: 600 .95rem/1.4 var(--body); margin: 26px 0 6px; }
+  .policy h4:first-child { margin-top: 0; }
+  .policy p, .policy li { color: var(--muted); max-width: 40em; }
+  .policy p { margin: 0 0 .8em; }
+  .policy ul { margin: 0 0 .8em; padding-left: 1.1em; }
+  .effective { font-family: var(--mono); font-size: .78rem; color: var(--muted); margin-top: 14px; }
+  @media (max-width: 760px) { .policy { grid-template-columns: 1fr; gap: 16px; margin-top: 40px; } }
+
+  footer { border-top: 1px solid var(--line); padding-block: 28px; color: var(--muted); font-size: .85rem; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  footer .links { display: flex; gap: 4px; flex-wrap: wrap; }
+  footer .links button { font: inherit; color: var(--muted); background: none; border: 0; padding: 8px 12px; border-radius: var(--r); cursor: pointer; }
+  footer .links button:hover { color: var(--ink); background: var(--surface); }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#home" data-go="home" aria-label="Melt Of Joy home"><img class="flame" src="images/logo-flame.png" alt=""><img class="word" src="images/logo-wordmark.png" alt="Melt Of Joy"></a>
+    <nav role="tablist" aria-label="Sections">
+      <button role="tab" id="tab-home" aria-controls="home" aria-selected="true" data-go="home">Our Story</button>
+      <button role="tab" id="tab-candles" aria-controls="candles" aria-selected="false" data-go="candles">Candles</button>
+      <button role="tab" id="tab-bouquets" aria-controls="bouquets" aria-selected="false" data-go="bouquets">Wax Bouquets</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HOME / STORY -->
+  <section role="tabpanel" id="home" aria-labelledby="tab-home">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Hand-poured candles &amp; wax bouquets</p>
+        <h1>Small things,<br>made <em>slowly</em>.</h1>
+        <p class="lede">Melt Of Joy makes candles and wax flower bouquets by hand, in small batches, for the people and moments that deserve a little warmth.</p>
+        <div class="ctas">
+          <button class="btn" data-go="candles">Shop candles</button>
+          <button class="btn ghost" data-go="bouquets">See wax bouquets</button>
+        </div>
+      </div>
+      <div class="hero-art"><img src="images/bouquet-black-tie-affair.jpg" alt="Black Tie Affair wax bouquet: red wax roses and greenery in a black bow-shaped vase"></div>
+    </div>
+
+    <div class="story">
+      <p class="eyebrow">Where we come from</p>
+      <div>
+        <p class="first">Melt Of Joy started at a kitchen table, with a double boiler, a bag of wax, and the idea that a gift should feel personal.</p>
+        <p>What began as candles poured for friends and family grew into a small business. Every piece is still poured, trimmed and wrapped by hand. We pick our scents to remind you of a place or a season, and we shape our wax bouquets so they last long after real flowers would have faded.</p>
+        <p>Everything we make is built to last and easy to enjoy. Our candles burn slow and clean, and our wax bouquets stay beautiful for years with no watering and almost no care.</p>
+        <div class="values">
+          <div><h3>Made by hand</h3><p>Small batches, poured and finished one at a time.</p></div>
+          <div><h3>Made to last</h3><p>Wax flowers that keep their shape and color for years.</p></div>
+          <div><h3>Easy to enjoy</h3><p>Light a candle or set out a bouquet. There is nothing else to do.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CANDLES -->
+  <section role="tabpanel" id="candles" aria-labelledby="tab-candles" hidden>
+    <div class="ph">
+      <div>
+        <p class="eyebrow">The collection</p>
+        <h2>Candles</h2>
+        <p class="lede">Hand-poured in a coconut soy blend. Each 10 oz jar has a wooden wick and burns for about 72 hours.</p>
+      </div>
+          </div>
+    <div class="grid four" id="candle-grid"></div>
+    <div class="care">
+      <p class="eyebrow">Candle care</p>
+      <ul>
+        <li>Let the first burn reach the edges of the jar so the wax melts evenly.</li>
+        <li>Trim the wick to about 1/4 inch before each light.</li>
+        <li>Burn for no more than 4 hours at a time.</li>
+        <li>Never leave a burning candle unattended.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- WAX BOUQUETS -->
+  <section role="tabpanel" id="bouquets" aria-labelledby="tab-bouquets" hidden>
+    <div class="ph">
+      <div>
+        <p class="eyebrow">The collection</p>
+        <h2>Wax <em>Bouquets</em></h2>
+        <p class="lede">Flowers shaped from wax by hand. They hold their color and never wilt.</p>
+      </div>
+    </div>
+    <div class="grid" id="bouquet-grid"></div>
+    <div class="care">
+      <p class="eyebrow">Bouquet care</p>
+      <ul>
+        <li>Keep out of direct sunlight and away from heat so the petals hold their shape.</li>
+        <li>Dust gently with a very soft feather duster or a soft, dry brush.</li>
+        <li>Wax bouquets are decorative. Please do not light them.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- POLICIES -->
+  <section role="tabpanel" id="policies" aria-label="Policies" hidden>
+    <div class="ph">
+      <div>
+        <p class="eyebrow">The fine print</p>
+        <h2>Policies</h2>
+        <p class="lede">Melt Of Joy sells locally and in person. This website shows our products and prices, but it does not take orders or payments. These policies explain how local purchases, returns and your information are handled.</p>
+        <p class="effective">Effective October 3, 2026</p>
+        <div class="policy-nav">
+          <button class="chip" data-go="policies" data-section="refund">Refund policy</button>
+          <button class="chip" data-go="policies" data-section="privacy">Privacy policy</button>
+          <button class="chip" data-go="policies" data-section="terms">Terms of service</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="policy" id="refund">
+      <h3>Refund policy</h3>
+      <div>
+        <h4>Check your order at handoff</h4>
+        <p>All sales happen in person. Please look over your candle or bouquet when you receive it. If anything is cracked, broken or not what you ordered, tell us right then and we will replace it or refund you on the spot.</p>
+        <h4>After you take it home</h4>
+        <ul>
+          <li>Unused candles in their original condition can be exchanged or refunded within 7 days of purchase. Please bring your receipt or proof of purchase.</li>
+          <li>Candles that have been lit cannot be returned, for safety and hygiene reasons.</li>
+          <li>Wax bouquets cannot be returned once they leave our hands, because heat, sunlight and handling can change their shape. If one arrives damaged, tell us at handoff.</li>
+          <li>Custom orders and personalized pieces are final sale once we start making them.</li>
+        </ul>
+        <h4>How refunds are paid</h4>
+        <p>Refunds go back the same way you paid. Cash purchases are refunded in cash. We arrange returns and exchanges in person.</p>
+      </div>
+    </div>
+
+    <div class="policy" id="privacy">
+      <h3>Privacy policy</h3>
+      <div>
+        <h4>What this website collects</h4>
+        <p>Nothing directly. This site has no accounts, no forms, no checkout, no analytics and no advertising trackers. We do not set cookies.</p>
+        <p>The site loads its fonts from Google Fonts. Like any website, that service receives basic technical details such as your IP address and browser type when the page loads.</p>
+        <h4>When you buy from us or contact us</h4>
+        <p>If you reach out or place a local order, we may keep your name, phone number or email and the details of your order. We use this only to reply to you, arrange pickup and keep simple sales records.</p>
+        <h4>What we never do</h4>
+        <p>We do not sell, rent or trade your information, and we do not add you to a mailing list without asking first.</p>
+        <h4>Your choices</h4>
+        <p>You can ask us at any time to see or delete the contact details we have for you, and we will do it.</p>
+      </div>
+    </div>
+
+    <div class="policy" id="terms">
+      <h3>Terms of service</h3>
+      <div>
+        <h4>About this website</h4>
+        <p>This website is a portfolio of Melt Of Joy LLC products. It is for information only. Nothing on it is an offer to sell online, and no purchase is made through it.</p>
+        <h4>Prices and availability</h4>
+        <p>Prices are in US dollars and may change without notice. Items are made in small batches, so availability is not guaranteed. The price that applies is the one agreed when you buy in person.</p>
+        <h4>Handmade differences</h4>
+        <p>Every candle and bouquet is made by hand. Color, shape, scent strength and arrangement can differ slightly from the photos, and no two pieces are exactly alike.</p>
+        <h4>Safe use</h4>
+        <ul>
+          <li>Never leave a burning candle unattended. Keep it away from children, pets, drafts and anything that can catch fire.</li>
+          <li>Wax bouquets are decorative only. Do not light them or place them near heat.</li>
+          <li>Melt Of Joy is not responsible for damage or injury caused by misuse of our products.</li>
+        </ul>
+        <h4>Our content</h4>
+        <p>The Melt Of Joy name, logo, photos and text on this site belong to Melt Of Joy LLC. Please do not copy or reuse them without our permission.</p>
+        <h4>Changes</h4>
+        <p>We may update these policies from time to time. The date at the top of this page shows when they last changed.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; <span id="yr">2026</span> Melt Of Joy LLC</span>
+    <div class="links" role="navigation" aria-label="Policies">
+      <button data-go="policies" data-section="refund">Refund policy</button>
+      <button data-go="policies" data-section="privacy">Privacy</button>
+      <button data-go="policies" data-section="terms">Terms</button>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ---- Edit products here ---- */
+  const CANDLES = [
+    { name: "Apple Cinnamon", img: "apple-cinnamon", price: 19 },
+    { name: "Aloe Baja",      img: "aloe-baja",      price: 19 },
+    { name: "Lavender",       img: "lavender",       price: 19 },
+    { name: "Beachy Breeze",  img: "beachy-breeze",  price: 19 }
+  ];
+
+  const BOUQUETS = [
+    { name: "Citrus Kiss",      price: 39,  size: "Mini",          img: "citrus-kiss",      alt: "orange and peach wax roses in a small white cup",
+      notes: "Tangerine and peach wax roses with sprigs of blue, in a small white cup." },
+    { name: "Peach Petite",     price: 39,  size: "Mini",          img: "peach-petite",     alt: "peach wax peonies and baby's breath in a small pink cup",
+      notes: "Soft peach peonies and baby's breath tucked into a blush pink cup." },
+    { name: "Petal Clutch",     price: 59,  size: "Purse",         img: "purse",            alt: "lavender and white wax roses with baby's breath in a lilac quilted purse box",
+      notes: "Lilac and ivory roses with violet baby's breath in a quilted purse with a gold chain." },
+    { name: "Woodland Dusk",    price: 59,   size: "Wood stump",    img: "woodland-dusk",    alt: "peach wax roses and dusty blue leaves in a bark stump",
+      notes: "Blush roses, baby's breath and dusty blue leaves in a natural bark stump." },
+    { name: "Harvest Hearth",   price: 59,   size: "Wood stump",    img: "harvest-hearth",   alt: "wax flowers, red berries and green leaves in a bark stump",
+      notes: "Autumn blooms, red berries and green leaves in a natural bark stump." },
+    { name: "Lilac Cloche",     price: 79,  size: "Glass dome",    img: "dome",             alt: "lavender and white wax roses under a glass dome on a wooden base",
+      notes: "Lavender and ivory blooms kept under a glass dome on a dark wood base." },
+    { name: "Cottage Bloom",    price: 129, size: "Jug vase",      img: "cottage-bloom",    alt: "neutral wax roses and dried florals in a white jug vase",
+      notes: "Cream and rose-toned blooms with dried florals in a white stoneware jug." },
+    { name: "Prairie Blush",    price: 129, size: "Crock vase",    img: "prairie-blush",    alt: "blush wax tulips, sage succulents and dried grasses in a white crock vase",
+      notes: "Blush tulips, sage succulents, eucalyptus and dried grasses in a white crock." },
+    { name: "Black Tie Affair", price: 149, size: "Bow tie vase",  img: "black-tie-affair", alt: "red wax roses and evergreen in a black bow-shaped vase",
+      notes: "Red roses, evergreen and pinecones in our black bow tie vase." }
+  ];
+  /* ---------------------------- */
+
+  const money = n => "$" + n;
+  function candleCard(p) {
+    return '<article class="card">' +
+      '<div class="img photo"><img src="images/candle-' + p.img + '.jpg" alt="' + p.name + ' candle in a glass jar with a wooden lid" loading="lazy"></div>' +
+      '<div class="row"><h3>' + p.name + '</h3><span class="price">' + money(p.price) + '</span></div>' +
+      '<p class="spec">10 oz &middot; Coconut soy blend &middot; About 72 hour burn</p>' +
+    '</article>';
+  }
+  function bouquetCard(p) {
+    return '<article class="card">' +
+      '<div class="img photo"><img src="images/bouquet-' + p.img + '.jpg" alt="' + p.name + ' wax bouquet: ' + p.alt + '" loading="lazy"></div>' +
+      '<div class="row"><h3>' + p.name + '</h3><span class="price">' + money(p.price) + '</span></div>' +
+      '<p class="notes">' + p.notes + '</p>' +
+      '<p class="spec">' + p.size + '</p>' +
+    '</article>';
+  }
+  document.getElementById("candle-grid").innerHTML = CANDLES.map(candleCard).join("");
+  document.getElementById("bouquet-grid").innerHTML = BOUQUETS.map(bouquetCard).join("");
+  document.getElementById("yr").textContent = new Date().getFullYear();
+
+  const PANELS = ["home", "candles", "bouquets", "policies"];
+  const SECTIONS = { refund: "policies", privacy: "policies", terms: "policies" };
+  const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let current = null, timer = null;
+
+  function reveal(el, section, animate) {
+    el.hidden = false;
+    if (animate) { el.classList.add("entering"); void el.offsetWidth; el.classList.remove("entering"); }
+    const target = section && document.getElementById(section);
+    if (target) target.scrollIntoView({ behavior: animate ? "smooth" : "auto", block: "start" });
+    else window.scrollTo({ top: 0 });
+  }
+
+  function show(id, push, section) {
+    if (SECTIONS[id]) { section = id; id = SECTIONS[id]; }
+    if (!PANELS.includes(id)) id = "home";
+    PANELS.forEach(p => {
+      const tab = document.getElementById("tab-" + p);
+      if (tab) tab.setAttribute("aria-selected", p === id);
+    });
+    const hashWanted = section || id;
+    if (push && location.hash.slice(1) !== hashWanted) { try { history.replaceState(null, "", "#" + hashWanted); } catch (e) {} }
+
+    const next = document.getElementById(id);
+    clearTimeout(timer);
+    PANELS.forEach(p => { const el = document.getElementById(p); if (el !== next && el !== current) { el.hidden = true; el.classList.remove("leaving"); } });
+    if (current === next || !current || calm()) {
+      if (current && current !== next) { current.hidden = true; current.classList.remove("leaving"); }
+      current = next; reveal(next, section, false);
+      return;
+    }
+    const prev = current; current = next;
+    prev.classList.add("leaving");
+    timer = setTimeout(() => {
+      prev.hidden = true; prev.classList.remove("leaving");
+      window.scrollTo({ top: 0 });
+      reveal(next, section, true);
+    }, 260);
+  }
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-go]");
+    if (!t) return;
+    e.preventDefault();
+    show(t.dataset.go, true, t.dataset.section);
+  });
+  document.querySelector("nav").addEventListener("keydown", e => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+    n.focus(); show(n.dataset.go, true);
+  });
+  window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+  show(location.hash.slice(1) || "home");
+</script>
+</body>
+</html>
